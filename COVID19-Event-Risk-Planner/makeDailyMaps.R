@@ -24,7 +24,7 @@ print(current_time)
 getData <- function() {
     dataurl <- "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
   data <- read.csv(dataurl, stringsAsFactors = FALSE) %>% mutate(date = as_date(date))
-  county <<- st_read("map_data/geomUnitedStates.geojson")
+  county <<- st_read("map_data/geomUnitedStates_nyt.geojson")
   stateline <<- st_read("map_data/US_stateLines.geojson")[,c('STUSPS','NAME')]
   names(stateline) <- c('stname','name')
   pop <- read.csv("map_data/county-population.csv", stringsAsFactors = FALSE)
@@ -39,6 +39,14 @@ getData <- function() {
       county == "New York City" ~ 99999,
       TRUE ~ as.numeric(fips)
     )) %>%
+    mutate(fips = case_when(
+      county == "Kansas City" ~ 29991,
+      TRUE ~ as.numeric(fips)
+    )) %>%
+	mutate(fips = case_when(
+      county == "Joplin" ~ 29992,
+      TRUE ~ as.numeric(fips)
+    )) %>%    
     select(c(state, fips, cases, deaths))
   data_past <- data %>%
     filter(date == past_date) %>%
@@ -46,6 +54,14 @@ getData <- function() {
       county == "New York City" ~ 99999,
       TRUE ~ as.numeric(fips)
     )) %>%
+    mutate(fips = case_when(
+      county == "Kansas City" ~ 29991,
+      TRUE ~ as.numeric(fips)
+    )) %>%
+	mutate(fips = case_when(
+      county == "Joplin" ~ 29992,
+      TRUE ~ as.numeric(fips)
+    )) %>%    
     select(fips = fips, cases_past = cases)
   data_join <<- data_cur %>%
     inner_join(data_past, by = "fips") %>%
